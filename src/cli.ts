@@ -6,10 +6,11 @@ import { resolveClipPath } from "./clipResolver";
 import { createMediaController } from "./obsController";
 
 async function main() {
-  const command = (process.argv[2] || "").toLowerCase();
-  if (!command || !["auth", "run", "simulate"].includes(command)) {
+  const rawArg = (process.argv[2] || "").toLowerCase();
+  const command = rawArg || "run";
+  if (!["auth", "run", "simulate"].includes(command)) {
     printUsage();
-    process.exit(command ? 1 : 0);
+    process.exit(1);
   }
 
   const config = loadConfig();
@@ -55,9 +56,10 @@ function printUsage() {
   console.log(`
 Reward Playback Runtime CLI
 Usage:
-  bun src/cli.ts auth   # Launch OAuth helper
-  bun src/cli.ts run    # Start Twitch listener -> OBS
-  bun src/cli.ts simulate "Play: tasty"  # Trigger playback for testing
+  reward-runtime.exe            # Default: run mode
+  reward-runtime.exe auth       # Launch OAuth helper
+  reward-runtime.exe run        # Start Twitch listener -> OBS
+  reward-runtime.exe simulate "Play: tasty"  # Trigger playback for testing
 
 Environment overrides:
   PDR_CONFIG_PATH=custom.json bun src/cli.ts run
