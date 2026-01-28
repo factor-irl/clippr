@@ -70,6 +70,20 @@ class RealObsController implements MediaController {
       overlay: true
     });
 
+    if (this.config.obsUnmuteOnPlay) {
+      await this.obs.call("SetInputMute", {
+        inputName: this.config.obsMediaSourceName,
+        inputMuted: false
+      });
+    }
+
+    if (typeof this.config.obsVolumeDb === "number" && Number.isFinite(this.config.obsVolumeDb)) {
+      await this.obs.call("SetInputVolume", {
+        inputName: this.config.obsMediaSourceName,
+        inputVolumeDb: this.config.obsVolumeDb
+      });
+    }
+
     await this.obs.call("TriggerMediaInputAction", {
       inputName: this.config.obsMediaSourceName,
       mediaAction: "OBS_WEBSOCKET_MEDIA_INPUT_ACTION_RESTART"

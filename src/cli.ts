@@ -13,7 +13,7 @@ async function main() {
   }
 
   const config = loadConfig();
-  console.log(`Loaded config from ${config.configPath}`);
+  console.log(`Loaded config from ${config.configPath} (secrets: ${config.secretsPath})`);
 
   if (command === "auth") {
     startAuthHelper(config);
@@ -61,6 +61,7 @@ Usage:
 
 Environment overrides:
   PDR_CONFIG_PATH=custom.json bun src/cli.ts run
+  PDR_SECRETS_PATH=custom-secrets.json bun src/cli.ts run
 `);
 }
 

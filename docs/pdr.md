@@ -96,16 +96,24 @@ OBS_PASSWORD (required)
 OBS_ADDRESS=ws://127.0.0.1:4455
 OBS_MEDIA_SOURCE_NAME=RewardClip
 CLIPS_DIR=./clips
+OBS_UNMUTE_ON_PLAY=1
+OBS_VOLUME_DB=0
 TITLE_PREFIX="Play:"
 EXTENSIONS=".mp4,.webm,.mov,.mkv"
 COOLDOWN_MS=1500
-TOKENS_FILE=./tokens.json
+TOKENS_FILE=./config/tokens.json
 SCOPES="channel:read:redemptions"
 PORT=3000
 REDIRECT_URI=http://localhost:3000/callback
 ```
 
-Values now live in `config/runtime.config.json` (gitignored) so broadcasters edit a single file instead of shell env vars. Use `PDR_CONFIG_PATH=/custom/file.json` to point at alternative configs; traditional env vars still override specific keys for advanced setups. When the bundled executable is launched from Windows, it automatically falls back to `runtime.config.json` in the same directory if `config/runtime.config.json` is absent.
+Values now live in `config/runtime.config.json` (gitignored) so broadcasters edit a single file instead of shell env vars. Use `PDR_CONFIG_PATH=/custom/file.json` to point at alternative configs; traditional env vars still override specific keys for advanced setups. When the bundled executable is launched from Windows, it automatically falls back to `runtime.config.json` in the same directory if `config/runtime.config.json` is absent. `OBS_UNMUTE_ON_PLAY` and `OBS_VOLUME_DB` give a guardrail for ensuring the media source is audible whenever redeems fire.
+
+Configuration is split into two JSON files so only high-level knobs live in source control:
+- `config/runtime.config.json` – non-sensitive options (ports, clip directories, OBS source name, cooldown timing, dry-run, etc.).
+- `config/secrets.config.json` – secrets and account identifiers (`twitchClientId`, `twitchClientSecret`, `broadcasterLogin`, `obsPassword`, `obsAddress`).
+
+Both files are gitignored and have `.example.json` templates checked in. The runtime loads `config/runtime.config.json` + `config/secrets.config.json`, falls back to `runtime.config.json` + `secrets.config.json` sitting beside the executable, and finally allows overrides via `PDR_CONFIG_PATH` / `PDR_SECRETS_PATH` or classic env vars.
 
 ## Implementation Plan
 1. **Project bootstrap** – keep single-file script or convert to small package; add `npm` and `bun` scripts for parity.
@@ -149,7 +157,7 @@ Values now live in `config/runtime.config.json` (gitignored) so broadcasters edi
     - `setx TWITCH_CLIENT_ID "..."` (or use `$env:VAR` per session).
     - `bun install` / `npm install`, then `bun run auth` / `bun run start`.
 - **Bun vs. Node**: keep code runtime-agnostic so either `bun` or `node` can execute it; Bun offers faster startup but is optional.
-- **Single-file executable**: `bun run build:exe` invokes `bun build src/cli.ts --compile --outfile dist/reward-runtime.exe`. Run that command on Windows to emit a native `.exe`, then copy `dist/reward-runtime.exe`, `runtime.config.json`, `tokens.json`, and the `clips/` folder to the streaming PC. The binary will read `runtime.config.json` located beside it unless `PDR_CONFIG_PATH` overrides the location.
+- **Single-file executable**: `bun run build:exe` invokes `bun build src/cli.ts --compile --outfile dist/reward-runtime.exe`. Run that command on Windows to emit a native `.exe`, then copy `dist/reward-runtime.exe`, `runtime.config.json`, `secrets.config.json`, `config/tokens.json` (or whatever `tokensFile` points to), and the `clips/` folder to the streaming PC. The binary will read the co-located config files unless `PDR_CONFIG_PATH` / `PDR_SECRETS_PATH` override the locations.
 - **Standalone executable**: Optional but available now; `bun run build:exe` outputs `dist/reward-runtime.exe` so broadcasters can double-click with `runtime.config.json` in the same folder.
 - OBS may run on Windows while development happens on macOS/Linux; nothing prevents developing/test-driving in WSL or macOS and then copying the project to Windows for final verification.
 

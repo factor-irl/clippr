@@ -3,6 +3,10 @@ node_modules
 bun.lockb
 dist
 tokens.json
+secrets.config.json
 config/runtime.config.json
+config/secrets.config.json
+config/tokens.json
 .env
 .env.local
+clips
