@@ -1,0 +1,24 @@
+{
+  "name": "clippr",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "auth": "bun src/cli.ts auth",
+    "start": "bun src/cli.ts run",
+    "dev": "bun run start",
+    "test": "bun test",
+    "build:exe": "bun build src/cli.ts --compile --outfile dist/reward-runtime.exe"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "obs-websocket-js": "^5.0.3",
+    "ws": "^8.16.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.11.30",
+    "@types/ws": "^8.5.10",
+    "typescript": "^5.9.3"
+  }
+}

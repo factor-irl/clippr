@@ -1,1 +1,8 @@
 .idea
+node_modules
+bun.lockb
+dist
+tokens.json
+config/runtime.config.json
+.env
+.env.local
